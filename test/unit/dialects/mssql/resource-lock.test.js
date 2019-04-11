@@ -1,7 +1,6 @@
 'use strict';
 
 const ResourceLock = require('../../../../lib/dialects/mssql/resource-lock'),
-  Promise = require('../../../../lib/promise'),
   assert = require('assert'),
   Support = require('../../support'),
   dialect = Support.getTestDialect();

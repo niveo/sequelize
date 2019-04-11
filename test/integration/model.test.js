@@ -9,7 +9,6 @@ const chai = require('chai'),
   sinon = require('sinon'),
   _ = require('lodash'),
   moment = require('moment'),
-  Promise = require('bluebird'),
   current = Support.sequelize,
   Op = Sequelize.Op,
   semver = require('semver');
@@ -314,7 +313,7 @@ describe(Support.getTestDialectTeaser('Model'), () => {
       });
 
       return User.sync({ force: true }).then(() => {
-        return Sequelize.Promise.all([
+        return Promise.all([
           User.create({ username: 'tobi', email: 'tobi@tobi.me' }),
           User.create({ username: 'tobi', email: 'tobi@tobi.me' })]);
       }).catch(Sequelize.UniqueConstraintError, err => {
@@ -346,7 +345,7 @@ describe(Support.getTestDialectTeaser('Model'), () => {
           user_id: { type: Sequelize.INTEGER, unique: { name: 'user_and_email_index', msg: 'User and email must be unique' } },
           email: { type: Sequelize.STRING, unique: 'user_and_email_index' }
         });
-        return Sequelize.Promise.all([
+        return Promise.all([
           User.create({ user_id: 1, email: 'tobi@tobi.me' }),
           User.create({ user_id: 1, email: 'tobi@tobi.me' })]);
       }).catch(Sequelize.UniqueConstraintError, err => {
@@ -815,7 +814,7 @@ describe(Support.getTestDialectTeaser('Model'), () => {
 
   describe('save', () => {
     it('should mapping the correct fields when saving instance. see #10589', function() {
-      const User = this.sequelize.define('User', { 
+      const User = this.sequelize.define('User', {
         id3: {
           field: 'id',
           type: Sequelize.INTEGER,
@@ -862,7 +861,7 @@ describe(Support.getTestDialectTeaser('Model'), () => {
     });
 
     it('should mapping the correct fields when updating instance. see #10589', function() {
-      const User = this.sequelize.define('User', { 
+      const User = this.sequelize.define('User', {
         id3: {
           field: 'id',
           type: Sequelize.INTEGER,
@@ -2837,7 +2836,7 @@ describe(Support.getTestDialectTeaser('Model'), () => {
           for (let i = 0; i < 1000; i++) {
             tasks.push(testAsync);
           }
-          return Sequelize.Promise.resolve(tasks).map(entry => {
+          return Promise.resolve(tasks).map(entry => {
             return entry();
           }, {
             // Needs to be one less than ??? else the non transaction query won't ever get a connection

@@ -8,9 +8,6 @@ const Config = require('./config/config');
 const chai = require('chai');
 const expect = chai.expect;
 const AbstractQueryGenerator = require('../lib/dialects/abstract/query-generator');
-const sinon = require('sinon');
-
-sinon.usingPromise(require('bluebird'));
 
 chai.use(require('chai-spies'));
 chai.use(require('chai-datetime'));
@@ -24,11 +21,6 @@ process.on('uncaughtException', e => {
   console.error('An unhandled exception occurred:');
   throw e;
 });
-Sequelize.Promise.onPossiblyUnhandledRejection(e => {
-  console.error('An unhandled rejection occurred:');
-  throw e;
-});
-Sequelize.Promise.longStackTraces();
 
 const Support = {
   Sequelize,
@@ -57,10 +49,10 @@ const Support = {
     if (dialect === 'sqlite') {
       const p = path.join(__dirname, 'tmp', 'db.sqlite');
 
-      return new Sequelize.Promise(resolve => {
+      return new Promise(resolve => {
         // We cannot promisify exists, since exists does not follow node callback convention - first argument is a boolean, not an error / null
         if (fs.existsSync(p)) {
-          resolve(Sequelize.Promise.promisify(fs.unlink)(p));
+          resolve(Promise.promisify(fs.unlink)(p));
         } else {
           resolve();
         }
@@ -78,7 +70,7 @@ const Support = {
     if (callback) {
       callback(sequelize);
     } else {
-      return Sequelize.Promise.resolve(sequelize);
+      return Promise.resolve(sequelize);
     }
   },
 
