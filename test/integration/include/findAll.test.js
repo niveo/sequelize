@@ -518,9 +518,7 @@ describe(Support.getTestDialectTeaser('Include'), () => {
             return promise;
           })([B, C, D, E, F, G, H])
         ]).then(([as, b]) => {
-          return Promise.map(as, a => {
-            return a.setB(b);
-          });
+          return Promise.all(as.map(a => a.setB(b)));
         }).then(() => {
           return A.findAll({
             include: [
@@ -616,9 +614,7 @@ describe(Support.getTestDialectTeaser('Include'), () => {
             return promise;
           })([B, C, D, E, F, G, H])
         ]).then(([as, b]) => {
-          return Promise.map(as, a => {
-            return a.setB(b);
-          });
+          return Promise.all(as.map(a => a.setB(b)));
         }).then(() => {
           return A.findAll({
             include: [
@@ -961,9 +957,7 @@ describe(Support.getTestDialectTeaser('Include'), () => {
           return Promise.all([
             users[0].setGroup(groups[1]),
             users[1].setGroup(groups[0]),
-            Promise.map(groups, group => {
-              return group.setCategories(categories);
-            })
+            Promise.all(groups.map(group => group.setCategories(categories)))
           ]);
         }).then(() => {
           return User.findAll({
@@ -1014,9 +1008,7 @@ describe(Support.getTestDialectTeaser('Include'), () => {
           return Promise.all([
             users[0].setTeam(groups[1]),
             users[1].setTeam(groups[0]),
-            Promise.map(groups, group => {
-              return group.setTags(categories);
-            })
+            Promise.all(groups.map(group => group.setTags(categories)))
           ]);
         }).then(() => {
           return User.findAll({
@@ -1067,9 +1059,7 @@ describe(Support.getTestDialectTeaser('Include'), () => {
           return Promise.all([
             users[0].setGroup(groups[1]),
             users[1].setGroup(groups[0]),
-            Promise.map(groups, group => {
-              return group.setCategories(categories);
-            })
+            Promise.all(groups.map(group => group.setCategories(categories)))
           ]);
         }).then(() => {
           return User.findAll({
@@ -1689,9 +1679,7 @@ describe(Support.getTestDialectTeaser('Include'), () => {
           Post.create({ 'public': true }),
           Post.create({ 'public': true })
         ]).then(posts => {
-          return Promise.map(posts.slice(1, 3), post => {
-            return post.createCategory({ slug: 'food' });
-          });
+          return Promise.all(posts.slice(1, 3).map(post => post.createCategory({ slug: 'food' })));
         }).then(() => {
           return Post.findAll({
             limit: 2,
