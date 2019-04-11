@@ -379,19 +379,17 @@ describe(Support.getTestDialectTeaser('Includes with schemas'), () => {
       return this.sequelize.sync().then(() => {
         return A.bulkCreate([
           {}, {}, {}, {}, {}, {}, {}, {}
-        ]).then(() => {
+        ]).then(async() => {
           let previousInstance;
-          return Promise.each(singles, model => {
-            return model.create({}).then(instance => {
-              if (previousInstance) {
-                return previousInstance[`set${_.upperFirst(model.name)}`](instance).then(() => {
-                  previousInstance = instance;
-                });
-              }
-              previousInstance = b = instance;
-              return void 0;
-            });
-          });
+          for (const model of singles) {
+            const instance = await model.create({});
+            if (previousInstance) {
+              return previousInstance[`set${_.upperFirst(model.name)}`](instance).then(() => {
+                previousInstance = instance;
+              });
+            }
+            previousInstance = b = instance;
+          }
         }).then(() => {
           return A.findAll();
         }).then(as => {

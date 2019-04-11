@@ -1364,21 +1364,20 @@ describe(Support.getTestDialectTeaser('HasMany'), () => {
       expect(Account.rawAttributes.UserId.field).to.equal('UserId');
     });
 
-    it('can specify data type for auto-generated relational keys', function() {
+    it('can specify data type for auto-generated relational keys', async function() {
       const User = this.sequelize.define('UserXYZ', { username: DataTypes.STRING }),
         dataTypes = [Sequelize.INTEGER, Sequelize.BIGINT, Sequelize.STRING],
         Tasks = {};
 
-      return Promise.each(dataTypes, dataType => {
+      for (const dataType of dataTypes) {
         const tableName = `TaskXYZ_${dataType.key}`;
         Tasks[dataType] = this.sequelize.define(tableName, { title: DataTypes.STRING });
 
         User.hasMany(Tasks[dataType], { foreignKey: 'userId', keyType: dataType, constraints: false });
 
-        return Tasks[dataType].sync({ force: true }).then(() => {
-          expect(Tasks[dataType].rawAttributes.userId.type).to.be.an.instanceof(dataType);
-        });
-      });
+        await Tasks[dataType].sync({ force: true });
+        expect(Tasks[dataType].rawAttributes.userId.type).to.be.an.instanceof(dataType);
+      }
     });
 
     it('infers the keyType if none provided', function() {

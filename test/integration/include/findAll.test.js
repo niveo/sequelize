@@ -123,7 +123,7 @@ describe(Support.getTestDialectTeaser('Include'), () => {
               tags = results.tags,
               companies = results.companies;
 
-            return Promise.each([0, 1, 2, 3, 4], i => {
+            for (let i = 0;i<5;++i) {
               return Promise.props({
                 user: User.create(),
                 products: Product.bulkCreate([
@@ -188,7 +188,7 @@ describe(Support.getTestDialectTeaser('Include'), () => {
                   ])
                 ]);
               });
-            });
+            }
           });
         });
       };
@@ -389,8 +389,8 @@ describe(Support.getTestDialectTeaser('Include'), () => {
           ]).then(() => {
             return Tag.findAll();
           })
-        ]).then(([groups, ranks, tags]) => {
-          return Promise.each([0, 1, 2, 3, 4], i => {
+        ]).then(async([groups, ranks, tags]) => {
+          for (let i = 0;i<5;++i) {
             return Promise.all([
               User.create(),
               Product.bulkCreate([
@@ -427,42 +427,41 @@ describe(Support.getTestDialectTeaser('Include'), () => {
                 ])
               ]);
             });
-          }).then(() => {
-            return User.findAll({
-              include: [
-                { model: GroupMember, as: 'Memberships', include: [
-                  Group,
-                  Rank
-                ] },
-                { model: Product, include: [
-                  Tag,
-                  { model: Tag, as: 'Category' },
-                  Price
-                ] }
-              ],
-              order: [
-                ['id', 'ASC']
-              ]
-            }).then(users => {
-              users.forEach(user => {
-                user.Memberships.sort(sortById);
+          }
+          await User.findAll({
+            include: [
+              { model: GroupMember, as: 'Memberships', include: [
+                Group,
+                Rank
+              ] },
+              { model: Product, include: [
+                Tag,
+                { model: Tag, as: 'Category' },
+                Price
+              ] }
+            ],
+            order: [
+              ['id', 'ASC']
+            ]
+          }).then(users => {
+            users.forEach(user => {
+              user.Memberships.sort(sortById);
 
-                expect(user.Memberships.length).to.equal(2);
-                expect(user.Memberships[0].Group.name).to.equal('Developers');
-                expect(user.Memberships[0].Rank.canRemove).to.equal(1);
-                expect(user.Memberships[1].Group.name).to.equal('Designers');
-                expect(user.Memberships[1].Rank.canRemove).to.equal(0);
+              expect(user.Memberships.length).to.equal(2);
+              expect(user.Memberships[0].Group.name).to.equal('Developers');
+              expect(user.Memberships[0].Rank.canRemove).to.equal(1);
+              expect(user.Memberships[1].Group.name).to.equal('Designers');
+              expect(user.Memberships[1].Rank.canRemove).to.equal(0);
 
-                user.Products.sort(sortById);
-                expect(user.Products.length).to.equal(2);
-                expect(user.Products[0].Tags.length).to.equal(2);
-                expect(user.Products[1].Tags.length).to.equal(1);
-                expect(user.Products[0].Category).to.be.ok;
-                expect(user.Products[1].Category).not.to.be.ok;
+              user.Products.sort(sortById);
+              expect(user.Products.length).to.equal(2);
+              expect(user.Products[0].Tags.length).to.equal(2);
+              expect(user.Products[1].Tags.length).to.equal(1);
+              expect(user.Products[0].Category).to.be.ok;
+              expect(user.Products[1].Category).not.to.be.ok;
 
-                expect(user.Products[0].Prices.length).to.equal(2);
-                expect(user.Products[1].Prices.length).to.equal(4);
-              });
+              expect(user.Products[0].Prices.length).to.equal(2);
+              expect(user.Products[1].Prices.length).to.equal(4);
             });
           });
         });
