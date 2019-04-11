@@ -188,7 +188,7 @@ describe(Support.getTestDialectTeaser('Pooling'), () => {
         })
         .then(() => {
           // Get next available connection
-          return Promise.delay(9).then(() => cm.getConnection());
+          return Support.delay(9).then(() => cm.getConnection());
         })
         .then(connection => {
           assertSameConnection(connection, conn);
@@ -225,7 +225,7 @@ describe(Support.getTestDialectTeaser('Pooling'), () => {
         })
         .then(() => {
           // Get next available connection
-          return Promise.delay(110).then(() => cm.getConnection());
+          return Support.delay(110).then(() => cm.getConnection());
         })
         .then(connection => {
           assertNewConnection(connection, conn);

@@ -860,11 +860,12 @@ describe(Support.getTestDialectTeaser('Hooks'), () => {
                 this.Projects.create({ title: 'New Project' }),
                 this.Tasks.create({ title: 'New Task' }),
                 this.MiniTasks.create({ mini_title: 'New MiniTask' })
-              ]).then(([project, task, minitask]) => {
-                return Promise.all([
+              ]).then(async([project, task, minitask]) => {
+                await Promise.all([
                   task.addMiniTask(minitask),
                   project.addTask(task)
-                ]).return(project);
+                ]);
+                return project;
               }).then(project => {
                 return project.destroy();
               }).then(() => {
@@ -915,11 +916,12 @@ describe(Support.getTestDialectTeaser('Hooks'), () => {
                 this.Projects.create({ title: 'New Project' }),
                 this.Tasks.create({ title: 'New Task' }),
                 this.MiniTasks.create({ mini_title: 'New MiniTask' })
-              ]).then(([project, task, minitask]) => {
-                return Promise.all([
+              ]).then(async([project, task, minitask]) => {
+                await Promise.all([
                   task.addMiniTask(minitask),
                   project.addTask(task)
-                ]).return(project);
+                ]);
+                return project;
               }).then(project => {
                 return expect(project.destroy()).to.eventually.be.rejectedWith(CustomErrorText).then(() => {
                   expect(beforeProject).to.be.true;

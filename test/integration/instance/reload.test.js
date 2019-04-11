@@ -239,9 +239,10 @@ describe(Support.getTestDialectTeaser('Instance'), () => {
         return Player.findOne({
           where: { id: shoe.Player.id },
           include: [Shoe]
-        }).then(lePlayer => {
+        }).then(async lePlayer => {
           expect(lePlayer.Shoe).not.to.be.null;
-          return lePlayer.Shoe.destroy().return(lePlayer);
+          await lePlayer.Shoe.destroy();
+          return lePlayer;
         }).then(lePlayer => {
           return lePlayer.reload();
         }).then(lePlayer => {
@@ -270,11 +271,11 @@ describe(Support.getTestDialectTeaser('Instance'), () => {
         return Team.findOne({
           where: { id: team.id },
           include: [Player]
-        }).then(leTeam => {
+        }).then(async leTeam => {
           expect(leTeam.Players).not.to.be.empty;
-          return leTeam.Players[1].destroy().then(() => {
-            return leTeam.Players[0].destroy();
-          }).return(leTeam);
+          await leTeam.Players[1].destroy();
+          await leTeam.Players[0].destroy();
+          return leTeam;
         }).then(leTeam => {
           return leTeam.reload();
         }).then(leTeam => {
@@ -304,9 +305,10 @@ describe(Support.getTestDialectTeaser('Instance'), () => {
         return Team.findOne({
           where: { id: team.id },
           include: [Player]
-        }).then(leTeam => {
+        }).then(async leTeam => {
           expect(leTeam.Players).to.have.length(2);
-          return leTeam.Players[0].destroy().return(leTeam);
+          await leTeam.Players[0].destroy();
+          return leTeam;
         }).then(leTeam => {
           return leTeam.reload();
         }).then(leTeam => {

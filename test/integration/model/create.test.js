@@ -200,14 +200,14 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         });
 
         return User.sync({ force: true }).then(() => {
-          return Promise.map(_.range(50), i => {
+          return Promise.all(_.times(50, i => {
             return User.findOrCreate({
               where: {
                 email: `unique.email.${i}@sequelizejs.com`,
                 companyId: Math.floor(Math.random() * 5)
               }
             });
-          });
+          }));
         });
       });
 
@@ -224,22 +224,22 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         });
 
         return User.sync({ force: true }).then(() => {
-          return Promise.map(_.range(50), i => {
+          return Promise.all(_.times(50, i => {
             return User.findOrCreate({
               where: {
                 email: `unique.email.${i}@sequelizejs.com`,
                 companyId: 2
               }
             });
-          }).then(() => {
-            return Promise.map(_.range(50), i => {
+          })).then(() => {
+            return Promise.all(_.times(50, i => {
               return User.findOrCreate({
                 where: {
                   email: `unique.email.${i}@sequelizejs.com`,
                   companyId: 2
                 }
               });
-            });
+            }));
           });
         });
       });
@@ -257,14 +257,14 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         });
 
         return User.sync({ force: true }).then(() => {
-          return Promise.map(_.range(50), () => {
+          return Promise.all(_.times(50, () => {
             return User.findOrCreate({
               where: {
                 email: 'unique.email.1@sequelizejs.com',
                 companyId: 2
               }
             });
-          });
+          }));
         });
       });
     }
@@ -394,22 +394,27 @@ describe(Support.getTestDialectTeaser('Model'), () => {
 
     if (current.dialect.supports.transactions) {
       it('should release transaction when meeting errors', function() {
-        const test = times => {
+        const test = async times => {
           if (times > 10) {
             return true;
           }
-          return this.Student.findOrCreate({
-            where: {
-              no: 1
+          try {
+            await Promise.race([
+              await this.Student.findOrCreate({
+                where: {
+                  no: 1
+                }
+              }),
+              new Promise((_, rej) => setTimeout(() => { rej(new Error('Timeout')); }, 1000))
+            ]);
+          } catch (err) {
+            if (err.message === 'Timeout') {
+              throw err;
             }
-          })
-            .timeout(1000)
-            .catch(Promise.TimeoutError, e => {
-              throw new Error(e);
-            })
-            .catch(Sequelize.ValidationError, () => {
-              return test(times + 1);
-            });
+            if (err instanceof Sequelize.ValidationError) {
+              await test(times + 1);
+            }
+          }
         };
 
         return test(0);

@@ -9,7 +9,6 @@ const chai = require('chai'),
   DataTypes = require('../../../lib/data-types'),
   dialect = Support.getTestDialect(),
   config = require('../../config/config'),
-  _ = require('lodash'),
   moment = require('moment'),
   current = Support.sequelize;
 
@@ -921,20 +920,21 @@ describe(Support.getTestDialectTeaser('Model'), () => {
           this.Person.belongsTo(this.Country, { as: 'CountryResident', foreignKey: 'CountryResidentId' });
 
           return this.sequelize.sync({ force: true }).then(() => {
-            return Promise.props({
-              europe: this.Continent.create({ name: 'Europe' }),
-              england: this.Country.create({ name: 'England' }),
-              coal: this.Industry.create({ name: 'Coal' }),
-              bob: this.Person.create({ name: 'Bob', lastName: 'Becket' })
-            }).then(r => {
-              _.forEach(r, (item, itemName) => {
-                this[itemName] = item;
-              });
+            return Promise.all([
+              this.Continent.create({ name: 'Europe' }),
+              this.Country.create({ name: 'England' }),
+              this.Industry.create({ name: 'Coal' }),
+              this.Person.create({ name: 'Bob', lastName: 'Becket' })
+            ]).then(([europe, england, coal, bob]) => {
+              this.europe = europe;
+              this.england = england;
+              this.coal = coal;
+              this.bob = bob;
               return Promise.all([
-                this.england.setContinent(this.europe),
-                this.england.addIndustry(this.coal),
-                this.bob.setCountry(this.england),
-                this.bob.setCountryResident(this.england)
+                england.setContinent(europe),
+                england.addIndustry(coal),
+                bob.setCountry(england),
+                bob.setCountryResident(england)
               ]);
             });
           });
@@ -1106,35 +1106,41 @@ describe(Support.getTestDialectTeaser('Model'), () => {
           this.Person.belongsTo(this.Country, { as: 'CountryResident', foreignKey: 'CountryResidentId' });
 
           return this.sequelize.sync({ force: true }).then(() => {
-            return Promise.props({
-              europe: this.Continent.create({ name: 'Europe' }),
-              asia: this.Continent.create({ name: 'Asia' }),
-              england: this.Country.create({ name: 'England' }),
-              france: this.Country.create({ name: 'France' }),
-              korea: this.Country.create({ name: 'Korea' }),
-              bob: this.Person.create({ name: 'Bob', lastName: 'Becket' }),
-              fred: this.Person.create({ name: 'Fred', lastName: 'Able' }),
-              pierre: this.Person.create({ name: 'Pierre', lastName: 'Paris' }),
-              kim: this.Person.create({ name: 'Kim', lastName: 'Z' })
-            }).then(r => {
-              _.forEach(r, (item, itemName) => {
-                this[itemName] = item;
-              });
+            return Promise.all([
+              this.Continent.create({ name: 'Europe' }),
+              this.Continent.create({ name: 'Asia' }),
+              this.Country.create({ name: 'England' }),
+              this.Country.create({ name: 'France' }),
+              this.Country.create({ name: 'Korea' }),
+              this.Person.create({ name: 'Bob', lastName: 'Becket' }),
+              this.Person.create({ name: 'Fred', lastName: 'Able' }),
+              this.Person.create({ name: 'Pierre', lastName: 'Paris' }),
+              this.Person.create({ name: 'Kim', lastName: 'Z' })
+            ]).then(([europe, asia, england, france, korea, bob, fred, pierre, kim]) => {
+              this.europe = europe;
+              this.asia = asia;
+              this.england = england;
+              this.france = france;
+              this.korea = korea;
+              this.bob = bob;
+              this.fred = fred;
+              this.pierre = pierre;
+              this.kim = kim;
 
               return Promise.all([
-                this.england.setContinent(this.europe),
-                this.france.setContinent(this.europe),
-                this.korea.setContinent(this.asia),
+                england.setContinent(europe),
+                france.setContinent(europe),
+                korea.setContinent(asia),
 
-                this.bob.setCountry(this.england),
-                this.fred.setCountry(this.england),
-                this.pierre.setCountry(this.france),
-                this.kim.setCountry(this.korea),
+                bob.setCountry(england),
+                fred.setCountry(england),
+                pierre.setCountry(france),
+                kim.setCountry(korea),
 
-                this.bob.setCountryResident(this.england),
-                this.fred.setCountryResident(this.france),
-                this.pierre.setCountryResident(this.korea),
-                this.kim.setCountryResident(this.england)
+                bob.setCountryResident(england),
+                fred.setCountryResident(france),
+                pierre.setCountryResident(korea),
+                kim.setCountryResident(england)
               ]);
             });
           });
@@ -1265,23 +1271,26 @@ describe(Support.getTestDialectTeaser('Model'), () => {
           this.Industry.belongsToMany(this.Country, { through: this.IndustryCountry });
 
           return this.sequelize.sync({ force: true }).then(() => {
-            return Promise.props({
-              england: this.Country.create({ name: 'England' }),
-              france: this.Country.create({ name: 'France' }),
-              korea: this.Country.create({ name: 'Korea' }),
-              energy: this.Industry.create({ name: 'Energy' }),
-              media: this.Industry.create({ name: 'Media' }),
-              tech: this.Industry.create({ name: 'Tech' })
-            }).then(r => {
-              _.forEach(r, (item, itemName) => {
-                this[itemName] = item;
-              });
+            return Promise.all([
+              this.Country.create({ name: 'England' }),
+              this.Country.create({ name: 'France' }),
+              this.Country.create({ name: 'Korea' }),
+              this.Industry.create({ name: 'Energy' }),
+              this.Industry.create({ name: 'Media' }),
+              this.Industry.create({ name: 'Tech' })
+            ]).then(([england, france, korea, energy, media, tech]) => {
+              this.england = england;
+              this.france = france;
+              this.korea = korea;
+              this.energy = energy;
+              this.media = media;
+              this.tech = tech;
 
               return Promise.all([
-                this.england.addIndustry(this.energy, { through: { numYears: 20 } }),
-                this.england.addIndustry(this.media, { through: { numYears: 40 } }),
-                this.france.addIndustry(this.media, { through: { numYears: 80 } }),
-                this.korea.addIndustry(this.tech, { through: { numYears: 30 } })
+                england.addIndustry(energy, { through: { numYears: 20 } }),
+                england.addIndustry(media, { through: { numYears: 40 } }),
+                france.addIndustry(media, { through: { numYears: 80 } }),
+                korea.addIndustry(tech, { through: { numYears: 30 } })
               ]);
             });
           });

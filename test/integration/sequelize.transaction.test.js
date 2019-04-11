@@ -100,7 +100,7 @@ if (current.dialect.supports.transactions) {
               return Test
                 .create({ name: 'Peter' }, { transaction })
                 .then(() => {
-                  return Promise.delay(1000).then(() => {
+                  return Support.delay(1000).then(() => {
                     return transaction
                       .commit()
                       .then(() => { return Test.count(); })
@@ -140,7 +140,7 @@ if (current.dialect.supports.transactions) {
                     expect(err).to.be.ok;
                     return t2.rollback();
                   }),
-                  Promise.delay(100).then(() => {
+                  Support.delay(100).then(() => {
                     return t1.commit();
                   })
                 ]);
