@@ -9,10 +9,6 @@ const chai = require('chai'),
   sinon = require('sinon'),
   current = Support.sequelize;
 
-function delay(ms) {
-  return new Promise(res => setTimeout(res, ms));
-}
-
 if (current.dialect.supports.transactions) {
 
   describe(Support.getTestDialectTeaser('Transaction'), () => {
@@ -127,12 +123,12 @@ if (current.dialect.supports.transactions) {
           // Attention: this test is a bit racy. If you find a nicer way to test this: go ahead
           await SumSumSum.sync({ force: true });
           await expect(Promise.all([transTest(80), transTest(80), transTest(80)])).to.eventually.be.rejectedWith('could not serialize access due to read/write dependencies among transactions');
-          await delay(100);
+          await Support.delay(100);
           if (this.sequelize.test.$runningQueries !== 0) {
-            await delay(200);
+            await Support.delay(200);
           }
           if (this.sequelize.test.$runningQueries !== 0) {
-            await delay(500);
+            await Support.delay(500);
           }
         });
       }

@@ -5,10 +5,6 @@ const ResourceLock = require('../../../../lib/dialects/mssql/resource-lock'),
   Support = require('../../support'),
   dialect = Support.getTestDialect();
 
-function delay(ms) {
-  return new Promise(res => setTimeout(res, ms));
-}
-
 if (dialect === 'mssql') {
   describe('[MSSQL Specific] ResourceLock', () => {
     it('should process requests serially', () => {
@@ -26,7 +22,7 @@ if (dialect === 'mssql') {
           assert.equal(last, 0);
           last = 1;
 
-          return delay(15);
+          return Support.delay(15);
         }),
         lock.lock(resource => {
           validateResource(resource);
@@ -38,7 +34,7 @@ if (dialect === 'mssql') {
           assert.equal(last, 2);
           last = 3;
 
-          return delay(5);
+          return Support.delay(5);
         })
       ]);
     });
