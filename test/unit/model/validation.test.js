@@ -308,7 +308,7 @@ describe(Support.getTestDialectTeaser('InstanceValidator'), () => {
         });
 
         it('should allow decimal as scientific notation', () => {
-          return Promise.join(
+          return Promise.all([
             expect(User.create({
               number: '2321312301230128391820e219'
             })).not.to.be.rejected,
@@ -318,7 +318,7 @@ describe(Support.getTestDialectTeaser('InstanceValidator'), () => {
             expect(User.create({
               number: '2321312301230128391820f219'
             })).to.be.rejected
-          );
+          ]);
         });
 
         it('should allow string as a number', () => {

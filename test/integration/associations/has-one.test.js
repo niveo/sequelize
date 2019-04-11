@@ -32,7 +32,7 @@ describe(Support.getTestDialectTeaser('HasOne'), () => {
         Player.User = Player.hasOne(User, { as: 'user' });
 
         return this.sequelize.sync({ force: true }).then(() => {
-          return Promise.join(
+          return Promise.all([
             Player.create({
               id: 1,
               user: {}
@@ -48,7 +48,7 @@ describe(Support.getTestDialectTeaser('HasOne'), () => {
             Player.create({
               id: 3
             })
-          );
+          ]);
         }).then(players => {
           return Player.User.get(players).then(result => {
             expect(result[players[0].id].id).to.equal(players[0].user.id);
@@ -899,9 +899,9 @@ describe(Support.getTestDialectTeaser('HasOne'), () => {
 
     it('should load with an alias', function() {
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           this.Individual.create({ name: 'Foo Bar' }),
-          this.Hat.create({ name: 'Baz' }));
+          this.Hat.create({ name: 'Baz' })]);
       }).then(([individual, hat]) => {
         return individual.setPersonwearinghat(hat);
       }).then(() => {
@@ -928,9 +928,9 @@ describe(Support.getTestDialectTeaser('HasOne'), () => {
 
     it('should load all', function() {
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           this.Individual.create({ name: 'Foo Bar' }),
-          this.Hat.create({ name: 'Baz' }));
+          this.Hat.create({ name: 'Baz' })]);
       }).then(([individual, hat]) => {
         return individual.setPersonwearinghat(hat);
       }).then(() => {

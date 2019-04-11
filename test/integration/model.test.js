@@ -316,7 +316,8 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         return Promise.all([
           User.create({ username: 'tobi', email: 'tobi@tobi.me' }),
           User.create({ username: 'tobi', email: 'tobi@tobi.me' })]);
-      }).catch(Sequelize.UniqueConstraintError, err => {
+      }).catch(err => {
+        expect(err).to.be.instanceof(Sequelize.UniqueConstraintError);
         expect(err.message).to.equal('User and email must be unique');
       });
     });
@@ -348,7 +349,8 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         return Promise.all([
           User.create({ user_id: 1, email: 'tobi@tobi.me' }),
           User.create({ user_id: 1, email: 'tobi@tobi.me' })]);
-      }).catch(Sequelize.UniqueConstraintError, err => {
+      }).catch(err => {
+        expect(err).to.be.instanceof(Sequelize.UniqueConstraintError);
         expect(err.message).to.equal('User and email must be unique');
       });
     });
@@ -1992,14 +1994,13 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         .then(() => PostComment.sync({ force: true }))
         .then(() => Post.create({}))
         .then(post => PostComment.bulkCreate([{ PostId: post.id }, { PostId: post.id }]))
-        .then(() => Promise.join(
+        .then(() => Promise.all([
           Post.count({ distinct: false, include: [{ model: PostComment, required: false }] }),
-          Post.count({ distinct: true, include: [{ model: PostComment, required: false }] }),
-          (count1, count2) => {
-            expect(count1).to.equal(2);
-            expect(count2).to.equal(1);
-          })
-        );
+          Post.count({ distinct: true, include: [{ model: PostComment, required: false }] })
+        ]).then((count1, count2) => {
+          expect(count1).to.equal(2);
+          expect(count2).to.equal(1);
+        }));
     });
 
   });
@@ -2208,11 +2209,11 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         }
       });
 
-      return Promise.join(
+      return Promise.all([
         this.UserWithAge.sync({ force: true }),
         this.UserWithDec.sync({ force: true }),
         this.UserWithFields.sync({ force: true })
-      );
+      ]);
     });
 
     it('should return the sum of the values for a field named the same as an SQL reserved keyword', function() {
@@ -2927,7 +2928,7 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         expect(user.bulkCreate(data, {
           validate: true,
           individualHooks: true
-        })).to.be.rejectedWith(Promise.AggregateError);
+        })).to.be.rejectedWith(Sequelize.AggregateError);
       });
     });
 

@@ -34,7 +34,7 @@ describe(Support.getTestDialectTeaser('BelongsTo'), () => {
         Task.User = Task.belongsTo(User, { as: 'user' });
 
         return this.sequelize.sync({ force: true }).then(() => {
-          return Promise.join(
+          return Promise.all([
             Task.create({
               id: 1,
               user: { id: 1 }
@@ -50,7 +50,7 @@ describe(Support.getTestDialectTeaser('BelongsTo'), () => {
             Task.create({
               id: 3
             })
-          );
+          ]);
         }).then(tasks => {
           return Task.User.get(tasks).then(result => {
             expect(result[tasks[0].id].id).to.equal(tasks[0].user.id);
@@ -365,10 +365,10 @@ describe(Support.getTestDialectTeaser('BelongsTo'), () => {
       Comment.belongsTo(Post, { foreignKey: 'post_id' });
 
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           Post.create(),
           Comment.create()
-        ).then(([post, comment]) => {
+        ]).then(([post, comment]) => {
           expect(comment.get('post_id')).not.to.be.ok;
 
           const setter = comment.setPost(post, { save: false });
@@ -990,9 +990,9 @@ describe(Support.getTestDialectTeaser('BelongsTo'), () => {
 
     it('should load with an alias', function() {
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           this.Individual.create({ name: 'Foo Bar' }),
-          this.Hat.create({ name: 'Baz' }));
+          this.Hat.create({ name: 'Baz' })]);
       }).then(([individual, hat]) => {
         return individual.setPersonwearinghat(hat);
       }).then(() => {
@@ -1019,9 +1019,9 @@ describe(Support.getTestDialectTeaser('BelongsTo'), () => {
 
     it('should load all', function() {
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           this.Individual.create({ name: 'Foo Bar' }),
-          this.Hat.create({ name: 'Baz' }));
+          this.Hat.create({ name: 'Baz' })]);
       }).then(([individual, hat]) => {
         return individual.setPersonwearinghat(hat);
       }).then(() => {

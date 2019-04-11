@@ -61,20 +61,18 @@ if (dialect.match(/^postgres/)) {
         friends: [{
           name: 'John Smith'
         }]
-      }).then(userInstance => {
+      }).then(async userInstance => {
         expect(userInstance.friends).to.have.length(1);
         expect(userInstance.friends[0].name).to.equal('John Smith');
 
-        return userInstance.update({
+        const { friends } = await userInstance.update({
           friends: [{
             name: 'John Smythe'
           }]
         });
-      }).get('friends')
-        .tap(friends => {
-          expect(friends).to.have.length(1);
-          expect(friends[0].name).to.equal('John Smythe');
-        });
+        expect(friends).to.have.length(1);
+        expect(friends[0].name).to.equal('John Smythe');
+      });
     });
 
     it('should be able to find a record while searching in an array', function() {

@@ -106,26 +106,23 @@ describe(Support.getTestDialectTeaser('Instance'), () => {
       });
     });
 
-    it('should support updating a subset of attributes', function() {
-      return this.User.create({
+    it('should support updating a subset of attributes', async function() {
+      let user = await this.User.create({
         aNumber: 1,
         bNumber: 1
-      }).tap(user => {
-        return this.User.update({
-          bNumber: 2
-        }, {
-          where: {
-            id: user.get('id')
-          }
-        });
-      }).then(user => {
-        return user.reload({
-          attributes: ['bNumber']
-        });
-      }).then(user => {
-        expect(user.get('aNumber')).to.equal(1);
-        expect(user.get('bNumber')).to.equal(2);
       });
+      await this.User.update({
+        bNumber: 2
+      }, {
+        where: {
+          id: user.get('id')
+        }
+      });
+      user = await user.reload({
+        attributes: ['bNumber']
+      });
+      expect(user.get('aNumber')).to.equal(1);
+      expect(user.get('bNumber')).to.equal(2);
     });
 
     it('should update read only attributes as well (updatedAt)', function() {

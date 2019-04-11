@@ -19,7 +19,7 @@ if (current.dialect.supports.groupedLimit) {
         User.Tasks = User.hasMany(Task, { as: 'tasks' });
 
         return this.sequelize.sync({ force: true }).then(() => {
-          return Promise.join(
+          return Promise.all([
             User.create({
               id: 1,
               tasks: [
@@ -38,7 +38,7 @@ if (current.dialect.supports.groupedLimit) {
             }, {
               include: [User.Tasks]
             })
-          ).then(() => {
+          ]).then(() => {
             return User.findAll({
               include: [
                 { association: User.Tasks, separate: true }
@@ -191,7 +191,7 @@ if (current.dialect.supports.groupedLimit) {
         User.Tasks = User.hasMany(Task, { as: 'tasks', foreignKey: 'userId' });
 
         return this.sequelize.sync({ force: true }).then(() => {
-          return Promise.join(
+          return Promise.all([
             User.create({
               id: 1,
               tasks: [
@@ -213,7 +213,7 @@ if (current.dialect.supports.groupedLimit) {
             }, {
               include: [User.Tasks]
             })
-          ).then(() => {
+          ]).then(() => {
             return User.findAll({
               include: [
                 { association: User.Tasks, limit: 2 }
@@ -243,7 +243,7 @@ if (current.dialect.supports.groupedLimit) {
         Company.Tasks = Company.hasMany(Task, { as: 'tasks' });
 
         return this.sequelize.sync({ force: true }).then(() => {
-          return Promise.join(
+          return Promise.all([
             User.create({
               id: 1,
               company: {
@@ -270,7 +270,7 @@ if (current.dialect.supports.groupedLimit) {
                 { association: User.Company, include: [Company.Tasks] }
               ]
             })
-          ).then(() => {
+          ]).then(() => {
             return User.findAll({
               include: [
                 { association: User.Company, include: [
@@ -304,7 +304,7 @@ if (current.dialect.supports.groupedLimit) {
         Task.Project = Task.belongsTo(Project, { as: 'project' });
 
         return this.sequelize.sync({ force: true }).then(() => {
-          return Promise.join(
+          return Promise.all([
             Company.create({
               id: 1,
               users: [
@@ -325,7 +325,7 @@ if (current.dialect.supports.groupedLimit) {
                 ] }
               ]
             })
-          ).then(() => {
+          ]).then(() => {
             return Company.findAll({
               include: [
                 { association: Company.Users, include: [
@@ -357,7 +357,7 @@ if (current.dialect.supports.groupedLimit) {
         Project.Tasks = Project.hasMany(Task, { as: 'tasks' });
 
         return this.sequelize.sync({ force: true }).then(() => {
-          return Promise.join(
+          return Promise.all([
             User.create({
               id: 1,
               projects: [
@@ -397,7 +397,7 @@ if (current.dialect.supports.groupedLimit) {
                 { association: User.Projects, include: [Project.Tasks] }
               ]
             })
-          ).then(() => {
+          ]).then(() => {
             return User.findAll({
               include: [
                 { association: User.Projects, separate: true, include: [
@@ -443,7 +443,7 @@ if (current.dialect.supports.groupedLimit) {
         return Support.dropTestSchemas(this.sequelize).then(() => {
           return this.sequelize.createSchema('archive').then(() => {
             return this.sequelize.sync({ force: true }).then(() => {
-              return Promise.join(
+              return Promise.all([
                 User.create({
                   id: 1,
                   tasks: [
@@ -465,7 +465,7 @@ if (current.dialect.supports.groupedLimit) {
                 }, {
                   include: [User.Tasks]
                 })
-              );
+              ]);
             }).then(() => {
               return User.findAll({
                 include: [{ model: Task, limit: 2, as: 'tasks', order: [['id', 'ASC']] }],

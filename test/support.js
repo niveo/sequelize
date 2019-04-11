@@ -56,14 +56,16 @@ const Support = {
         } else {
           resolve();
         }
-      }).then(() => {
+      }).then(async() => {
         const options = Object.assign({}, sequelize.options, { storage: p }),
           _sequelize = new Sequelize(sequelize.config.database, null, null, options);
 
         if (callback) {
-          _sequelize.sync({ force: true }).then(() => { callback(_sequelize); });
+          await _sequelize.sync({ force: true });
+          callback(_sequelize);
         } else {
-          return _sequelize.sync({ force: true }).return(_sequelize);
+          await _sequelize.sync({ force: true });
+          return _sequelize;
         }
       });
     }

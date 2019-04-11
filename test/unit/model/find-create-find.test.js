@@ -53,7 +53,6 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         findSpy = this.sinon.stub(Model, 'findOne');
 
       this.sinon.stub(Model, 'create').rejects(new UniqueConstraintError());
-
       findSpy.onFirstCall().resolves(null);
       findSpy.onSecondCall().resolves(result);
 

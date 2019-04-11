@@ -256,10 +256,10 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
       Group.belongsToMany(User, { as: 'users', through: User_has_Group, foreignKey: 'id_group' });
 
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           User.create(),
           Group.create()
-        ).then(([user, group]) => {
+        ]).then(([user, group]) => {
           return user.addGroup(group);
         }).then(() => {
           return User.findOne({
@@ -306,13 +306,13 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
       Group.belongsToMany(User, { through: User_has_Group });
 
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           User.create(),
           Group.create()
-        ).then(([user, group]) => {
+        ]).then(([user, group]) => {
           return user.addGroup(group);
         }).then(() => {
-          return Promise.join(
+          return Promise.all([
             User.findOne({
               where: {},
               include: [Group]
@@ -320,7 +320,7 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
             User.findAll({
               include: [Group]
             })
-          );
+          ]);
         });
       });
     });
@@ -374,17 +374,17 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
       Group.belongsToMany(Company, { through: Company_has_Group });
 
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           User.create(),
           Group.create(),
           Company.create()
-        ).then(([user, group, company]) => {
-          return Promise.join(
+        ]).then(([user, group, company]) => {
+          return Promise.all([
             user.setCompany(company),
             company.addGroup(group)
-          );
+          ]);
         }).then(() => {
-          return Promise.join(
+          return Promise.all([
             User.findOne({
               where: {},
               include: [
@@ -407,7 +407,7 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
                 { model: Company, required: true, include: [Group] }
               ]
             })
-          );
+          ]);
         });
       });
     });
@@ -631,7 +631,7 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
         }
       });
 
-      return Promise.join(
+      return Promise.all([
         this.Task.create().then(task => {
           return user.addTask(task, {
             through: { started: true }
@@ -642,7 +642,7 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
             through: { started: true }
           });
         })
-      ).then(() => {
+      ]).then(() => {
         return expect(user.countStartedTasks({})).to.eventually.equal(2);
       });
     });
@@ -725,8 +725,9 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
           Group.create({ group_id: 1, name: 'Group1' }),
           Member.create({ member_id: 10, email: 'team@sequelizejs.com' })
         ]);
-      }).then(([group, member]) => {
-        return group.addMember(member).return(group);
+      }).then(async([group, member]) => {
+        await group.addMember(member);
+        return group;
       }).then(group => {
         return group.getMembers();
       }).then(members => {
@@ -978,13 +979,10 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
       return this.sequelize.sync({ force: true }).then(() => {
         return Group.create({});
       }).then(group => {
-        return Promise.join(
+        return Promise.all([
           group.createUser({ id: 1 }, { through: { isAdmin: true } }),
-          group.createUser({ id: 2 }, { through: { isAdmin: false } }),
-          () => {
-            return UserGroups.findAll();
-          }
-        );
+          group.createUser({ id: 2 }, { through: { isAdmin: false } })
+        ]).then(() => UserGroups.findAll());
       }).then(userGroups => {
         userGroups.sort((a, b) => {
           return a.userId < b.userId ? - 1 : 1;
@@ -1553,11 +1551,11 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
       const spy = sinon.spy();
 
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           this.User.create({ name: 'Matt' }),
           this.Project.create({ name: 'Good Will Hunting' }),
           this.Project.create({ name: 'The Departed' })
-        );
+        ]);
       }).then(([user, project1, project2]) => {
         return user.addProjects([project1, project2], {
           logging: spy
@@ -1565,12 +1563,12 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
       }).then(user => {
         expect(spy).to.have.been.calledTwice;
         spy.resetHistory();
-        return Promise.join(
+        return Promise.all([
           user,
           user.getProjects({
             logging: spy
           })
-        );
+        ]);
       }).then(([user, projects]) => {
         expect(spy.calledOnce).to.be.ok;
         const project = projects[0];
@@ -1649,11 +1647,11 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
       });
 
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           this.Group.create({ groupName: 'The Illuminati' }),
           this.User.create({ name: 'Matt' }),
           this.Project.create({ name: 'Good Will Hunting' })
-        );
+        ]);
       }).then(([group, user, project]) => {
         return user.addProject(project).then(() => {
           return group.addUser(user).return(group);
@@ -2346,26 +2344,26 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
 
         const ctx = {};
         return this.sequelize.sync({ force: true }).then(() => {
-          return Promise.join(
+          return Promise.all([
             this.User.create({ id: 67, username: 'foo' }),
             this.Task.create({ id: 52, title: 'task' }),
             this.User.create({ id: 89, username: 'bar' }),
             this.Task.create({ id: 42, title: 'kast' })
-          );
+          ]);
         }).then(([user1, task1, user2, task2]) => {
           ctx.user1 = user1;
           ctx.task1 = task1;
           ctx.user2 = user2;
           ctx.task2 = task2;
-          return Promise.join(
+          return Promise.all([
             user1.setTasks([task1]),
             task2.setUsers([user2])
-          );
+          ]);
         }).then(() => {
-          return Promise.join(
+          return Promise.all([
             expect(ctx.user1.destroy()).to.have.been.rejectedWith(Sequelize.ForeignKeyConstraintError), // Fails because of RESTRICT constraint
             ctx.task2.destroy()
-          );
+          ]);
         }).then(() => {
           return this.sequelize.model('tasksusers').findAll({ where: { taskId: ctx.task2.id } });
         }).then(usertasks => {
@@ -2593,9 +2591,9 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
 
     it('should load with an alias', function() {
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           this.Individual.create({ name: 'Foo Bar' }),
-          this.Hat.create({ name: 'Baz' }));
+          this.Hat.create({ name: 'Baz' })]);
       }).then(([individual, hat]) => {
         return individual.addPersonwearinghat(hat);
       }).then(() => {
@@ -2621,9 +2619,9 @@ describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
 
     it('should load all', function() {
       return this.sequelize.sync({ force: true }).then(() => {
-        return Promise.join(
+        return Promise.all([
           this.Individual.create({ name: 'Foo Bar' }),
-          this.Hat.create({ name: 'Baz' }));
+          this.Hat.create({ name: 'Baz' })]);
       }).then(([individual, hat]) => {
         return individual.addPersonwearinghat(hat);
       }).then(() => {
