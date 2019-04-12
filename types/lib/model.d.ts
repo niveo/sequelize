@@ -1381,6 +1381,14 @@ export interface ModelOptions<M extends Model = Model> {
    */
   tableName?: string;
 
+  /**
+   * Disable if your model is used with a database view, which can generate an exeception in createTableQuery.
+   * Default true.
+   */
+  createTable?: boolean;
+
+  dataBaseName?:string;
+
   schema?: string;
 
   /**
